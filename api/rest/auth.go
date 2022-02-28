@@ -20,6 +20,7 @@ func (s *Handler) register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		s.writeInternalError(ctx, w, err)
+		return
 	}
 	s.writeResult(ctx, w, http.StatusOK, u)
 }
@@ -38,11 +39,13 @@ func (s *Handler) login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		s.writeInternalError(ctx, w, err)
+		return
 	}
 	// create token
 	_, token, err := s.TokenAuth.Encode(map[string]interface{}{"user": u})
 	if err != nil {
 		s.writeInternalError(ctx, w, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

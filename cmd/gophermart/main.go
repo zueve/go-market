@@ -9,14 +9,15 @@ import (
 	"strings"
 	"time"
 
-	// "github.com/golang-migrate/migrate"
-
 	"github.com/go-chi/jwtauth/v5"
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zueve/go-market/api/rest"
 	"github.com/zueve/go-market/config"
+	"github.com/zueve/go-market/pkg/migrate"
 	"github.com/zueve/go-market/providers/postgres"
 	"github.com/zueve/go-market/services/user"
 )
@@ -42,7 +43,18 @@ func run() error {
 		return err
 	}
 
-	storage := postgres.Storage{}
+	// run migrations on startup
+	if err = migrate.Run(conf.DatabaseDSN, conf.MigrateFile); err != nil {
+		return err
+	}
+
+	db, err := sqlx.Open("pgx", conf.DatabaseDSN)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	storage := postgres.Storage{DB: db}
 	userSrv := user.UserService{Storage: &storage}
 	tokenAuth := jwtauth.New("HS256", []byte(conf.Secret), nil)
 	handler, err := rest.New(userSrv, tokenAuth)

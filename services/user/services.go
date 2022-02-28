@@ -15,10 +15,10 @@ type UserService struct {
 
 func (s *UserService) Create(ctx context.Context, login string, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("Create user: %s", login)
-	// if err := s.Storage.create(ctx, login, password); err != nil {
-	// 	s.log(ctx).Info().Msgf("Fail %s", err)
-	// 	return services.User{}, err
-	// }
+	if err := s.Storage.Create(ctx, login, password); err != nil {
+		s.log(ctx).Info().Msgf("Fail %s", err)
+		return services.User{}, err
+	}
 	return services.User{Login: login}, nil
 }
 
