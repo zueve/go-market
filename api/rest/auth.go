@@ -1,7 +1,10 @@
 package rest
 
 import (
+	"context"
 	"net/http"
+
+	"github.com/zueve/go-market/services"
 )
 
 func (s *Handler) register(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +18,7 @@ func (s *Handler) register(w http.ResponseWriter, r *http.Request) {
 		s.writeErr(ctx, w, err)
 		return
 	}
-	s.writeResult(ctx, w, http.StatusOK, u)
+	s.writeToken(ctx, w, u)
 }
 
 func (s *Handler) login(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +32,12 @@ func (s *Handler) login(w http.ResponseWriter, r *http.Request) {
 		s.writeErr(ctx, w, err)
 		return
 	}
-	// create token
+	s.writeToken(ctx, w, u)
+
+}
+
+func (s *Handler) writeToken(ctx context.Context, w http.ResponseWriter, u services.User) {
+	// create auth token
 	_, token, err := s.TokenAuth.Encode(map[string]interface{}{"user": u})
 	if err != nil {
 		s.writeInternalError(ctx, w, err)

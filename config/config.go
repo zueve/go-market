@@ -5,12 +5,13 @@ import (
 )
 
 type Config struct {
-	ServerAddress string `env:"SERVER_ADDRESS" envDefault:":8080"`
-	DatabaseDSN   string `env:"DB_DSN" envDefault:"postgres://user:pass@database/db"`
+	ServerAddress string `env:"RUN_ADDRESS" envDefault:":8080"`
+	DatabaseDSN   string `env:"DATABASE_URI" envDefault:"postgres://user:pass@database/db"`
 	MigrateFile   string `env:"MIGRATE" envDefault:"migrations"`
 	Secret        string `env:"SECRET" envDefault:"secret"`
 	LogLevel      string `env:"LOG_LEVEL" envDefault:"INFO"`
 	LogColor      bool   `env:"LOG_COLOR" envDefault:"false"`
+	ACCRUAL_URI   string `env:"ACCRUAL_SYSTEM_ADDRESS" envDefault:"accrual:8080"`
 }
 
 func NewFromEnv() (*Config, error) {
