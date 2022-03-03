@@ -6,6 +6,7 @@ type (
 		Password string `json:"password"`
 	}
 	AuthToken struct {
-		AccessToken string `json:"token"`
+		Token string `json:"access_token"`
+		Type  string `json:"token_type"`
 	}
 )

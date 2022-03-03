@@ -42,7 +42,7 @@ func (s *Handler) writeToken(ctx context.Context, w http.ResponseWriter, u servi
 		s.writeInternalError(ctx, w, err)
 		return
 	}
-	response := AuthToken{AccessToken: token}
+	response := AuthToken{Token: token, Type: "Bearer"}
 
 	s.writeResult(ctx, w, http.StatusOK, response)
 }
