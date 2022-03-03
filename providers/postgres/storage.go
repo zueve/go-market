@@ -22,9 +22,8 @@ func (s *Storage) Create(ctx context.Context, login string, password string) err
 	if _, err := s.DB.ExecContext(ctx, query, login, password); err != nil {
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 			return user.ErrLoginExists
-		} else {
-			return err
 		}
+		return err
 	}
 	return nil
 }

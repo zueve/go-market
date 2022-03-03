@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/zueve/go-market/pkg/logging"
+	"github.com/zueve/go-market/services/user"
 
 	"github.com/rs/zerolog"
 )
@@ -45,6 +46,14 @@ func (s *Handler) writeResult(ctx context.Context, w http.ResponseWriter, status
 	s.writeResponse(ctx, w, status, response)
 }
 
+func (s *Handler) writeErr(ctx context.Context, w http.ResponseWriter, err error) {
+	if httpError, ok := s.toHTTPError(err); ok {
+		s.writeHTTPError(ctx, w, httpError)
+	} else {
+		s.writeInternalError(ctx, w, err)
+	}
+}
+
 func (s *Handler) writeHTTPError(ctx context.Context, w http.ResponseWriter, httpError HTTPError) {
 	data, err := httpError.ToJSON()
 	if err != nil {
@@ -66,5 +75,16 @@ func (s *Handler) writeResponse(ctx context.Context, w http.ResponseWriter, stat
 	_, err := w.Write(data)
 	if err != nil {
 		s.log(ctx).Error().Err(err).Msg("could't write Response")
+	}
+}
+
+func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
+	switch err {
+	case user.ErrAuth:
+		return NewAuthErr(err), true
+	case user.ErrLoginExists:
+		return NewLoginExistsErr(err), true
+	default:
+		return HTTPError{}, false
 	}
 }

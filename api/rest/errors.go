@@ -22,7 +22,7 @@ func (s *HTTPError) ToJSON() ([]byte, error) {
 
 func NewAuthErr(err error) HTTPError {
 	return HTTPError{
-		StatusCode: http.StatusBadRequest,
+		StatusCode: http.StatusUnauthorized,
 		Code:       "InvalidLogin",
 		Message:    err.Error(),
 		Details:    nil,
@@ -31,7 +31,7 @@ func NewAuthErr(err error) HTTPError {
 
 func NewLoginExistsErr(err error) HTTPError {
 	return HTTPError{
-		StatusCode: http.StatusBadRequest,
+		StatusCode: http.StatusConflict,
 		Code:       "LoginExists",
 		Message:    err.Error(),
 		Details:    nil,

@@ -29,7 +29,7 @@ func New(service user.Service, tokenAuth *jwtauth.JWTAuth) (Handler, error) {
 	router.Use(middleware.Recoverer)
 	router.Use(logging.AccessLog())
 
-	router.Post("/api/register", h.register)
-	router.Post("/api/login", h.login)
+	router.Post("/api/user/register", h.register)
+	router.Post("/api/user/login", h.login)
 	return h, nil
 }
