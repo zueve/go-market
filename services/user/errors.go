@@ -3,6 +3,6 @@ package user
 import "errors"
 
 var (
-	LoginExistsErr = errors.New("Login allready exists")
-	AuthErr        = errors.New("Invalid login or password")
+	ErrLoginExists = errors.New("login already exists")
+	ErrAuth        = errors.New("invalid login or password")
 )

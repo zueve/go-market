@@ -9,11 +9,11 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type UserService struct {
+type Service struct {
 	Storage StorageExpected
 }
 
-func (s *UserService) Create(ctx context.Context, login string, password string) (services.User, error) {
+func (s *Service) Create(ctx context.Context, login string, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("Create user: %s", login)
 	if err := s.Storage.Create(ctx, login, password); err != nil {
 		s.log(ctx).Info().Msgf("Fail %s", err)
@@ -22,7 +22,7 @@ func (s *UserService) Create(ctx context.Context, login string, password string)
 	return services.User{Login: login}, nil
 }
 
-func (s *UserService) Login(ctx context.Context, login string, password string) (services.User, error) {
+func (s *Service) Login(ctx context.Context, login string, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("login as user: %s", login)
 	if err := s.Storage.CheckPassword(ctx, login, password); err != nil {
 		s.log(ctx).Info().Msgf("Fail %s", err)
@@ -31,7 +31,7 @@ func (s *UserService) Login(ctx context.Context, login string, password string) 
 	return services.User{Login: login}, nil
 }
 
-func (s *UserService) log(ctx context.Context) *zerolog.Logger {
+func (s *Service) log(ctx context.Context) *zerolog.Logger {
 	logger := logging.GetLogger(ctx).With().
 		Str(logging.Source, "User").
 		Str(logging.Layer, "service").

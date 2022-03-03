@@ -14,7 +14,7 @@ func (s *Handler) register(w http.ResponseWriter, r *http.Request) {
 	}
 	u, err := s.UserService.Create(ctx, data.Login, data.Password)
 	if err != nil {
-		if err == user.LoginExistsErr {
+		if err == user.ErrLoginExists {
 			httpErr := NewLoginExistsErr(err)
 			s.writeHTTPError(ctx, w, httpErr)
 			return
@@ -33,7 +33,7 @@ func (s *Handler) login(w http.ResponseWriter, r *http.Request) {
 	}
 	u, err := s.UserService.Login(ctx, data.Login, data.Password)
 	if err != nil {
-		if err == user.AuthErr {
+		if err == user.ErrAuth {
 			httpErr := NewAuthErr(err)
 			s.writeHTTPError(ctx, w, httpErr)
 			return

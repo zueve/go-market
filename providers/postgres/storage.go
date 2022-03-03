@@ -21,8 +21,8 @@ func (s *Storage) Create(ctx context.Context, login string, password string) err
 	var pgErr *pgconn.PgError
 	if _, err := s.DB.ExecContext(ctx, query, login, password); err != nil {
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return user.LoginExistsErr
-		} else if err != nil {
+			return user.ErrLoginExists
+		} else {
 			return err
 		}
 	}
@@ -31,15 +31,15 @@ func (s *Storage) Create(ctx context.Context, login string, password string) err
 
 func (s *Storage) CheckPassword(ctx context.Context, login string, password string) error {
 	query := "SELECT password_hash from customer where login = $1"
-	var stored_hash string
-	if err := s.DB.GetContext(ctx, &stored_hash, query, login); err != nil {
+	var storedHash string
+	if err := s.DB.GetContext(ctx, &storedHash, query, login); err != nil {
 		if err == sql.ErrNoRows {
-			return user.AuthErr
+			return user.ErrAuth
 		}
 		return err
 	}
-	if stored_hash != password {
-		return user.AuthErr
+	if storedHash != password {
+		return user.ErrAuth
 	}
 	return nil
 }
