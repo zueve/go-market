@@ -43,10 +43,7 @@ func (s *Handler) writeToken(ctx context.Context, w http.ResponseWriter, u servi
 		s.writeInternalError(ctx, w, err)
 		return
 	}
+	response := AuthToken{AccessToken: token}
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("content-type", "text/plain")
-	if _, err := w.Write([]byte(token)); err != nil {
-		s.log(ctx).Error().Err(err).Msg("")
-	}
+	s.writeResult(ctx, w, http.StatusOK, response)
 }
