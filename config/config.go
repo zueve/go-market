@@ -11,7 +11,7 @@ type Config struct {
 	Secret        string `env:"SECRET" envDefault:"secret"`
 	LogLevel      string `env:"LOG_LEVEL" envDefault:"INFO"`
 	LogColor      bool   `env:"LOG_COLOR" envDefault:"false"`
-	ACCRUAL_URI   string `env:"ACCRUAL_SYSTEM_ADDRESS" envDefault:"accrual:8080"`
+	AccrualURI    string `env:"ACCRUAL_SYSTEM_ADDRESS" envDefault:"accrual:8080"`
 }
 
 func NewFromEnv() (*Config, error) {

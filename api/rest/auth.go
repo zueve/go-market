@@ -33,7 +33,6 @@ func (s *Handler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.writeToken(ctx, w, u)
-
 }
 
 func (s *Handler) writeToken(ctx context.Context, w http.ResponseWriter, u services.User) {
