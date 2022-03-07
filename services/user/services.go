@@ -13,7 +13,7 @@ type Service struct {
 	Storage StorageExpected
 }
 
-func (s *Service) Create(ctx context.Context, login string, password string) (services.User, error) {
+func (s *Service) Create(ctx context.Context, login, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("Create user: %s", login)
 	if err := s.Storage.Create(ctx, login, password); err != nil {
 		s.log(ctx).Info().Msgf("Fail %s", err)
@@ -22,7 +22,7 @@ func (s *Service) Create(ctx context.Context, login string, password string) (se
 	return services.User{Login: login}, nil
 }
 
-func (s *Service) Login(ctx context.Context, login string, password string) (services.User, error) {
+func (s *Service) Login(ctx context.Context, login, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("login as user: %s", login)
 	if err := s.Storage.CheckPassword(ctx, login, password); err != nil {
 		s.log(ctx).Info().Msgf("Fail %s", err)

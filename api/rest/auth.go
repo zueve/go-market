@@ -42,7 +42,6 @@ func (s *Handler) writeToken(ctx context.Context, w http.ResponseWriter, u servi
 		s.writeInternalError(ctx, w, err)
 		return
 	}
-	response := AuthToken{Token: token, Type: "Bearer"}
-
-	s.writeResult(ctx, w, http.StatusOK, response)
+	w.Header().Set("X-Authorization", "Bearer "+token)
+	w.WriteHeader(http.StatusOK)
 }

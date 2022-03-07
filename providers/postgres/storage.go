@@ -11,6 +11,8 @@ import (
 	"github.com/zueve/go-market/services/user"
 )
 
+var _ user.StorageExpected = (*Storage)(nil)
+
 type Storage struct {
 	DB *sqlx.DB
 }
