@@ -1,8 +1,12 @@
 package user
 
-import "context"
+import (
+	"context"
+
+	"github.com/zueve/go-market/services"
+)
 
 type StorageExpected interface {
-	CheckPassword(ctx context.Context, login string, password string) error
-	Create(ctx context.Context, login string, password string) error
+	CheckPassword(ctx context.Context, login string, password string) (services.User, error)
+	Create(ctx context.Context, login string, password string) (services.User, error)
 }

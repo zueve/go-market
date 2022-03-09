@@ -15,16 +15,16 @@ type Service struct {
 	Billing billing.Service
 }
 
-func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (AccrualOrder, error) {
+func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (Order, error) {
 	s.log(ctx).Info().Msgf("Receive New order: %d", num)
-	order := AccrualOrder{Num: num, Status: StatusNew, User: user.Login}
+	order := Order{Num: num, Status: StatusNew, User: user.Login}
 	if err := s.Storage.NewOrder(ctx, order); err != nil {
 		return order, err
 	}
 	return order, nil
 }
 
-func (s *Service) GetOrders(ctx context.Context, user services.User) ([]AccrualOrder, error) {
+func (s *Service) GetOrders(ctx context.Context, user services.User) ([]Order, error) {
 	orders, err := s.Storage.GetOrders(ctx, user.Login)
 	if err != nil {
 		return nil, err
@@ -33,9 +33,9 @@ func (s *Service) GetOrders(ctx context.Context, user services.User) ([]AccrualO
 	return orders, nil
 }
 
-func (s *Service) UpdateOrderStatus(ctx context.Context, order AccrualOrder) (AccrualOrder, error) {
+func (s *Service) UpdateOrderStatus(ctx context.Context, order Order) (Order, error) {
 	if err := s.Storage.UpdateOrderStatus(ctx, order); err != nil {
-		return nil, err
+		return Order{}, err
 	}
 	return order, nil
 }

@@ -7,7 +7,7 @@ const (
 	StatusProcessed  string = "PROCESSED"
 )
 
-type AccrualOrder struct {
+type Order struct {
 	Num    int64
 	Status string
 	User   string

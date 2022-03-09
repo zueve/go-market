@@ -11,8 +11,8 @@ type (
 
 	WithdrawalProcessedOrder struct {
 		WithdrawalOrder
-		processed time.Time
-		ID        int64
+		ID        int
+		Processed time.Time
 	}
 )
 
@@ -25,6 +25,7 @@ type (
 
 	DepositProcessedOrder struct {
 		DepositOrder
-		processed time.Time
+		ID        int
+		Processed time.Time
 	}
 )

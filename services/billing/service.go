@@ -14,12 +14,12 @@ type Service struct {
 }
 
 func (s *Service) NewWithdrawal(ctx context.Context, order WithdrawalOrder) (WithdrawalProcessedOrder, error) {
-	s.log(ctx).Info().Msgf("Receive New order: %s", order)
-	order, err := s.Storage.NewWithdrawal(ctx, order)
+	s.log(ctx).Info().Msgf("Receive New order: %d - %d USD", order.Invoice, order.Amount)
+	processedOrder, err := s.Storage.NewWithdrawal(ctx, order)
 	if err != nil {
 		return WithdrawalProcessedOrder{}, err
 	}
-	return order, nil
+	return processedOrder, nil
 }
 
 func (s *Service) GetWithdrawalsOrders(ctx context.Context, user services.User) ([]WithdrawalProcessedOrder, error) {
@@ -32,10 +32,12 @@ func (s *Service) GetWithdrawalsOrders(ctx context.Context, user services.User) 
 }
 
 func (s *Service) NewDeposit(ctx context.Context, order DepositOrder) (DepositProcessedOrder, error) {
-	if err := s.Storage.NewDeposit(ctx, order); err != nil {
-		return nil, err
+	processedOrder, err := s.Storage.NewDeposit(ctx, order)
+
+	if err != nil {
+		return DepositProcessedOrder{}, err
 	}
-	return order, nil
+	return processedOrder, nil
 }
 
 func (s *Service) log(ctx context.Context) *zerolog.Logger {

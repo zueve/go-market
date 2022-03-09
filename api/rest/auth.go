@@ -42,6 +42,6 @@ func (s *Handler) writeToken(ctx context.Context, w http.ResponseWriter, u servi
 		s.writeInternalError(ctx, w, err)
 		return
 	}
-	w.Header().Set("X-Authorization", "Bearer "+token)
+	w.Header().Set("Authorization", "Bearer "+token)
 	w.WriteHeader(http.StatusOK)
 }

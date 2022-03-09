@@ -15,20 +15,22 @@ type Service struct {
 
 func (s *Service) Create(ctx context.Context, login, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("Create user: %s", login)
-	if err := s.Storage.Create(ctx, login, password); err != nil {
+	user, err := s.Storage.Create(ctx, login, password)
+	if err != nil {
 		s.log(ctx).Info().Msgf("Fail %s", err)
 		return services.User{}, err
 	}
-	return services.User{Login: login}, nil
+	return user, nil
 }
 
 func (s *Service) Login(ctx context.Context, login, password string) (services.User, error) {
 	s.log(ctx).Info().Msgf("login as user: %s", login)
-	if err := s.Storage.CheckPassword(ctx, login, password); err != nil {
+	user, err := s.Storage.CheckPassword(ctx, login, password)
+	if err != nil {
 		s.log(ctx).Info().Msgf("Fail %s", err)
 		return services.User{}, err
 	}
-	return services.User{Login: login}, nil
+	return user, nil
 }
 
 func (s *Service) log(ctx context.Context) *zerolog.Logger {
