@@ -13,31 +13,22 @@ type Service struct {
 	Storage StorageExpected
 }
 
-func (s *Service) NewWithdrawal(ctx context.Context, order WithdrawalOrder) (WithdrawalProcessedOrder, error) {
-	s.log(ctx).Info().Msgf("Receive New order: %d - %d USD", order.Invoice, order.Amount)
-	processedOrder, err := s.Storage.NewWithdrawal(ctx, order)
+func (s *Service) Process(ctx context.Context, order services.OrderValue) (services.ProcessedOrder, error) {
+	s.log(ctx).Info().Msgf("Receive New order: %s - %d USD", order.Invoice, order.Amount)
+	processedOrder, err := s.Storage.Process(ctx, order)
 	if err != nil {
-		return WithdrawalProcessedOrder{}, err
+		return services.ProcessedOrder{}, err
 	}
 	return processedOrder, nil
 }
 
-func (s *Service) GetWithdrawalsOrders(ctx context.Context, user services.User) ([]WithdrawalProcessedOrder, error) {
+func (s *Service) GetWithdrawalsOrders(ctx context.Context, user services.User) ([]services.ProcessedOrder, error) {
 	orders, err := s.Storage.GetWithdrawalOrders(ctx, user.Login)
 	if err != nil {
 		return nil, err
 	}
 
 	return orders, nil
-}
-
-func (s *Service) NewDeposit(ctx context.Context, order DepositOrder) (DepositProcessedOrder, error) {
-	processedOrder, err := s.Storage.NewDeposit(ctx, order)
-
-	if err != nil {
-		return DepositProcessedOrder{}, err
-	}
-	return processedOrder, nil
 }
 
 func (s *Service) log(ctx context.Context) *zerolog.Logger {

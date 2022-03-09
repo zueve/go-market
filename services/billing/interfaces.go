@@ -1,9 +1,12 @@
 package billing
 
-import "context"
+import (
+	"context"
+
+	"github.com/zueve/go-market/services"
+)
 
 type StorageExpected interface {
-	NewWithdrawal(ctx context.Context, order WithdrawalOrder) (WithdrawalProcessedOrder, error)
-	NewDeposit(ctx context.Context, order DepositOrder) (DepositProcessedOrder, error)
-	GetWithdrawalOrders(ctx context.Context, user string) ([]WithdrawalProcessedOrder, error)
+	Process(ctx context.Context, order services.OrderValue) (services.ProcessedOrder, error)
+	GetWithdrawalOrders(ctx context.Context, user string) ([]services.ProcessedOrder, error)
 }
