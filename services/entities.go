@@ -2,6 +2,11 @@ package services
 
 import "time"
 
+const (
+	DirectionDeposit    = "DEPOSIT"
+	DirectionWithdrawal = "WITHDRAWAL"
+)
+
 type User struct {
 	Login string
 	ID    int
@@ -10,7 +15,7 @@ type User struct {
 type (
 	OrderValue struct {
 		Invoice   string
-		User      string
+		UserID    int
 		Amount    int64
 		IsDeposit bool
 	}
@@ -20,3 +25,10 @@ type (
 		Processed time.Time
 	}
 )
+
+func (s *OrderValue) Direction() string {
+	if s.IsDeposit {
+		return DirectionDeposit
+	}
+	return DirectionWithdrawal
+}

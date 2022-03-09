@@ -6,21 +6,21 @@ CREATE TABLE IF NOT EXISTS customer (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_customer_login ON customer(login);
 
-CREATE TABLE IF NOT EXISTS billing_balance (
+CREATE TABLE IF NOT EXISTS billing (
     id SERIAL PRIMARY KEY,
     customer_id INT NOT NULL,
-    amount INT NOT NULL CHECK (amount > 0),
+    amount INT NOT NULL CHECK (amount >= 0),
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (customer_id) REFERENCES customer (id)
 );
 
-CREATE TABLE IF NOT EXISTS billing_operations (
+CREATE TABLE IF NOT EXISTS billing_order (
     id SERIAL PRIMARY KEY,
-    balance_id INT NOT NULL,
-    invoice VARCHAR(16) NOT NULL,
+    billing_id INT NOT NULL,
+    invoice VARCHAR(16) NOT NULL UNIQUE,
     direction VARCHAR(16) NOT NULL,
     amount INT NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (balance_id) REFERENCES billing_balance (id)
+    FOREIGN KEY (billing_id) REFERENCES billing (id)
 );
