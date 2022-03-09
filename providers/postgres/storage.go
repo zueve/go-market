@@ -19,7 +19,7 @@ type Storage struct {
 }
 
 func (s *Storage) Create(ctx context.Context, login string, password string) (services.User, error) {
-	query := "INSERT INTO customer(login, password_hash) VALUES($1, $2)"
+	query := "INSERT INTO customer(login, password_hash) VALUES($1, $2) returning id"
 
 	var (
 		id    int
