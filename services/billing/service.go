@@ -23,7 +23,7 @@ func (s *Service) Process(ctx context.Context, order services.OrderValue) (servi
 }
 
 func (s *Service) GetWithdrawalsOrders(ctx context.Context, user services.User) ([]services.ProcessedOrder, error) {
-	orders, err := s.Storage.GetWithdrawalOrders(ctx, user.Login)
+	orders, err := s.Storage.GetWithdrawalOrders(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}

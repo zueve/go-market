@@ -6,21 +6,24 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 
 	"github.com/zueve/go-market/pkg/logging"
+	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 )
 
 type Handler struct {
-	Handler     chi.Router
-	UserService user.Service
-	TokenAuth   *jwtauth.JWTAuth
+	Handler        chi.Router
+	UserService    user.Service
+	BillingService billing.Service
+	TokenAuth      *jwtauth.JWTAuth
 }
 
-func New(service user.Service, tokenAuth *jwtauth.JWTAuth) (Handler, error) {
+func New(userSrv user.Service, billingSrv billing.Service, tokenAuth *jwtauth.JWTAuth) (Handler, error) {
 	router := chi.NewRouter()
 	h := Handler{
-		Handler:     router,
-		UserService: service,
-		TokenAuth:   tokenAuth,
+		Handler:        router,
+		UserService:    userSrv,
+		BillingService: billingSrv,
+		TokenAuth:      tokenAuth,
 	}
 	router.Use(middleware.AllowContentType("application/json"))
 	router.Use(middleware.Heartbeat("/ping"))
@@ -31,5 +34,13 @@ func New(service user.Service, tokenAuth *jwtauth.JWTAuth) (Handler, error) {
 
 	router.Post("/api/user/register", h.register)
 	router.Post("/api/user/login", h.login)
+
+	router.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+		r.Use(jwtauth.Authenticator)
+
+		router.Get("/api/user/balance/withdraw", h.getWithdrawals)
+	})
+
 	return h, nil
 }

@@ -7,17 +7,17 @@ import (
 )
 
 type Operation struct {
-	ID        int       `db:"id"`
-	Invoice   string    `db:"invoice"`
-	BalanceID int       `db:"balance_id"`
-	UserID    int       `db:"user_id"`
-	Direction string    `db:"direction"`
-	Amount    int64     `db:"amount"`
-	Created   time.Time `db:"created"`
+	ID         int       `db:"id"`
+	Invoice    string    `db:"invoice"`
+	BillingID  int       `db:"billing_id"`
+	CustomerID int       `db:"customer_id"`
+	Direction  string    `db:"direction"`
+	Amount     int64     `db:"amount"`
+	Created    time.Time `db:"created"`
 }
 
 func (s *Operation) IsDeposit() bool {
-	return s.Direction == "DEPOSIT"
+	return s.Direction == services.DirectionDeposit
 }
 
 func (s *Operation) ToOrder() services.ProcessedOrder {
@@ -25,7 +25,7 @@ func (s *Operation) ToOrder() services.ProcessedOrder {
 		OrderValue: services.OrderValue{
 			Invoice:   s.Invoice,
 			Amount:    s.Amount,
-			UserID:    s.UserID,
+			UserID:    s.CustomerID,
 			IsDeposit: s.IsDeposit(),
 		},
 		ID:        s.ID,

@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
+
 	"github.com/zueve/go-market/services"
 	"github.com/zueve/go-market/services/billing"
 )
@@ -63,8 +64,24 @@ func (s *Storage) Process(ctx context.Context, order services.OrderValue) (servi
 
 	return s.GetProcessedOrderByInvoice(order.Invoice)
 }
-func (s *Storage) GetWithdrawalOrders(ctx context.Context, user string) ([]services.ProcessedOrder, error) {
-	return nil, nil
+
+func (s *Storage) GetWithdrawalOrders(ctx context.Context, userID int) ([]services.ProcessedOrder, error) {
+	var operations []Operation
+	query := `
+		SELECT b.customer_id, o.*
+		FROM billing b
+		JOIN billing_order o on(b.id=o.billing_id)
+		WHERE b.customer_id=$1 AND o.direction=$2
+		ORDER BY id desc`
+
+	if err := s.DB.Select(&operations, query, userID, services.DirectionWithdrawal); err != nil {
+		return nil, err
+	}
+	orders := make([]services.ProcessedOrder, len(operations))
+	for i := range operations {
+		orders[i] = operations[i].ToOrder()
+	}
+	return orders, nil
 }
 
 func (s *Storage) GetProcessedOrderByInvoice(invoice string) (services.ProcessedOrder, error) {
