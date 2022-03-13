@@ -9,4 +9,5 @@ import (
 type StorageExpected interface {
 	Process(ctx context.Context, order services.OrderValue) (services.ProcessedOrder, error)
 	GetWithdrawalOrders(ctx context.Context, userID int) ([]services.ProcessedOrder, error)
+	GetBalance(ctx context.Context, userID int) (Balance, error)
 }

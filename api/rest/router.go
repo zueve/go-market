@@ -39,7 +39,9 @@ func New(userSrv user.Service, billingSrv billing.Service, tokenAuth *jwtauth.JW
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
 
-		router.Get("/api/user/balance/withdraw", h.getWithdrawals)
+		r.Get("/api/user/balance", h.getBalance)
+		r.Get("/api/user/balance/withdraw", h.getWithdrawals)
+		r.Post("/api/user/balance/withdraw", h.createWithdrawal)
 	})
 
 	return h, nil

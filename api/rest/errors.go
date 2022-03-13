@@ -82,3 +82,12 @@ func NewNotFound(message string) HTTPError {
 		Details:    nil,
 	}
 }
+
+func NewOutOfMoney(err error) HTTPError {
+	return HTTPError{
+		StatusCode: http.StatusPaymentRequired,
+		Code:       "OutOfMoney",
+		Message:    err.Error(),
+		Details:    nil,
+	}
+}

@@ -10,3 +10,10 @@ type (
 		Type  string `json:"token_type"`
 	}
 )
+
+type (
+	WithdrawalRequest struct {
+		Invoice string `json:"order"`
+		Amount  int64  `json:"sum"`
+	}
+)

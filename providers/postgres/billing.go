@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/jackc/pgconn"
@@ -31,7 +32,7 @@ func (s *Storage) Process(ctx context.Context, order services.OrderValue) (servi
 
 	// Add order
 	query = `
-		INSERT INTO billing_order(balance_id, invoice, direction, amount)
+		INSERT INTO billing_order(billing_id, invoice, direction, amount)
 		VALUES($1, $2, $3, $4)
 	`
 	if _, err := tx.ExecContext(ctx, query, billingID, order.Invoice, order.Direction(), order.Amount); err != nil {
@@ -91,4 +92,28 @@ func (s *Storage) GetProcessedOrderByInvoice(invoice string) (services.Processed
 		return order, err
 	}
 	return order, nil
+}
+
+func (s *Storage) GetBalance(ctx context.Context, userID int) (billing.Balance, error) {
+	query := `
+		SELECT b.amount balance, coalesce(sum(o.amount), 0) withdrawn
+		FROM billing b
+		LEFT JOIN billing_order o on (b.id = o.billing_id)
+		WHERE customer_id=$1
+		GROUP BY b.amount
+	`
+	type Row struct {
+		Balance   int64 `db:"balance"`
+		Withdrawn int64 `db:"withdrawn"`
+	}
+	var row Row
+	if err := s.DB.GetContext(ctx, &row, query, userID); err != nil {
+		if err == sql.ErrNoRows {
+			return billing.Balance{Balance: 0, Withdrawn: 0}, nil
+		}
+		return billing.Balance{}, err
+	}
+
+	balance := billing.Balance{Balance: row.Balance, Withdrawn: row.Withdrawn}
+	return balance, nil
 }

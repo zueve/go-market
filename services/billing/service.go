@@ -31,6 +31,15 @@ func (s *Service) GetWithdrawalsOrders(ctx context.Context, user services.User) 
 	return orders, nil
 }
 
+func (s *Service) GetBalance(ctx context.Context, user services.User) (Balance, error) {
+	balance, err := s.Storage.GetBalance(ctx, user.ID)
+	if err != nil {
+		return Balance{}, err
+	}
+
+	return balance, nil
+}
+
 func (s *Service) log(ctx context.Context) *zerolog.Logger {
 	logger := logging.GetLogger(ctx).With().
 		Str(logging.Source, "User").

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/zueve/go-market/pkg/logging"
+	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 
 	"github.com/rs/zerolog"
@@ -84,6 +85,8 @@ func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
 		return NewAuthErr(err), true
 	case user.ErrLoginExists:
 		return NewLoginExistsErr(err), true
+	case billing.ErrNotEnoughtMoney:
+		return NewOutOfMoney(err), true
 	default:
 		return HTTPError{}, false
 	}

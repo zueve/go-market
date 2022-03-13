@@ -14,15 +14,15 @@ type User struct {
 
 type (
 	OrderValue struct {
-		Invoice   string
-		UserID    int
-		Amount    int64
-		IsDeposit bool
+		Invoice   string `json:"order"`
+		UserID    int    `json:"-"`
+		Amount    int64  `json:"sum"`
+		IsDeposit bool   `json:"is_deposit"`
 	}
 	ProcessedOrder struct {
 		OrderValue
-		ID        int
-		Processed time.Time
+		ID        int       `json:"-"`
+		Processed time.Time `json:"processed_at"`
 	}
 )
 
