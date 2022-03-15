@@ -49,8 +49,8 @@ func (s *Accrual) ToService() accrual.Order {
 			Invoice: s.Invoice,
 			UserID:  s.CustomerID,
 			Status:  s.Status,
+			Amount:  s.Amount,
 		},
-		Amount:  s.Amount,
 		Created: s.Created,
 	}
 }

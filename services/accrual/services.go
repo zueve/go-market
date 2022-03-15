@@ -17,7 +17,12 @@ type Service struct {
 
 func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (OrderVal, error) {
 	s.log(ctx).Info().Msgf("Receive New order: %d", num)
-	order := OrderVal{Invoice: num, Status: StatusNew, UserID: user.ID}
+	order := OrderVal{
+		Invoice: num,
+		Status:  StatusNew,
+		UserID:  user.ID,
+		Amount:  0,
+	}
 	if err := s.Storage.NewOrder(ctx, order); err != nil {
 		return order, err
 	}

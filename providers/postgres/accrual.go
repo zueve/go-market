@@ -28,10 +28,10 @@ func (s *Storage) NewOrder(ctx context.Context, order accrual.OrderVal) error {
 	// Add order
 	query := `
 		INSERT INTO accrual(customer_id, invoice, status, amount)
-		VALUES($1, $2, $3, 0)
+		VALUES(:UserID, :Invoice, :Status, :Amount)
 		ON CONFLICT DO NOTHING
 	`
-	if _, err := s.DB.ExecContext(ctx, query, order.UserID, order.Invoice, order.Status); err != nil {
+	if _, err := s.DB.NamedExecContext(ctx, query, order); err != nil {
 		return err
 	}
 	return nil
@@ -40,10 +40,10 @@ func (s *Storage) NewOrder(ctx context.Context, order accrual.OrderVal) error {
 func (s *Storage) UpdateOrderStatus(ctx context.Context, order accrual.OrderVal) error {
 	query := `
 		UPDATE accrual
-		SET status=$1, updated=now()
-		WHERE invoice = $2
+		SET status=:Status, amount:Amount, updated=now()
+		WHERE invoice = :Invoice
 	`
-	if _, err := s.DB.ExecContext(ctx, query, order.Status, order.Invoice); err != nil {
+	if _, err := s.DB.NamedExecContext(ctx, query, order); err != nil {
 		return err
 	}
 	return nil
