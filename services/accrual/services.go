@@ -30,7 +30,7 @@ func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (
 }
 
 func (s *Service) GetOrders(ctx context.Context, user services.User) ([]Order, error) {
-	orders, err := s.Storage.GetOrders(ctx, user.Login)
+	orders, err := s.Storage.GetOrders(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}

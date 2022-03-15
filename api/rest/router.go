@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 
 	"github.com/zueve/go-market/pkg/logging"
+	"github.com/zueve/go-market/services/accrual"
 	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 )
@@ -14,16 +15,20 @@ type Handler struct {
 	Handler        chi.Router
 	UserService    user.Service
 	BillingService billing.Service
+	AccrualService accrual.Service
 	TokenAuth      *jwtauth.JWTAuth
 }
 
-func New(userSrv user.Service, billingSrv billing.Service, tokenAuth *jwtauth.JWTAuth) (Handler, error) {
+func New(
+	tokenAuth *jwtauth.JWTAuth, userSrv user.Service, billingSrv billing.Service, accrualSrv accrual.Service,
+) (Handler, error) {
 	router := chi.NewRouter()
 	h := Handler{
 		Handler:        router,
+		TokenAuth:      tokenAuth,
 		UserService:    userSrv,
 		BillingService: billingSrv,
-		TokenAuth:      tokenAuth,
+		AccrualService: accrualSrv,
 	}
 	router.Use(middleware.AllowContentType("application/json"))
 	router.Use(middleware.Heartbeat("/ping"))
@@ -39,9 +44,14 @@ func New(userSrv user.Service, billingSrv billing.Service, tokenAuth *jwtauth.JW
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
 
+		// billing
 		r.Get("/api/user/balance", h.getBalance)
 		r.Get("/api/user/balance/withdraw", h.getWithdrawals)
 		r.Post("/api/user/balance/withdraw", h.createWithdrawal)
+
+		// accrual
+		r.Get("/api/user/orders", h.getAccrualOrders)
+		r.Post("/api/user/orders", h.createAccrualOrder)
 	})
 
 	return h, nil

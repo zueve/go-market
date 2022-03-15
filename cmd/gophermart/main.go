@@ -18,6 +18,7 @@ import (
 	"github.com/zueve/go-market/pkg/logging"
 	"github.com/zueve/go-market/pkg/migrate"
 	"github.com/zueve/go-market/providers/postgres"
+	"github.com/zueve/go-market/services/accrual"
 	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 )
@@ -57,8 +58,9 @@ func run() error {
 	storage := postgres.Storage{DB: db}
 	userSrv := user.Service{Storage: &storage}
 	billingSrv := billing.Service{Storage: &storage}
+	accrualSrv := accrual.Service{Storage: &storage, Billing: billingSrv}
 	tokenAuth := jwtauth.New("HS256", []byte(conf.Secret), nil)
-	handler, err := rest.New(userSrv, billingSrv, tokenAuth)
+	handler, err := rest.New(tokenAuth, userSrv, billingSrv, accrualSrv)
 	if err != nil {
 		return err
 	}
