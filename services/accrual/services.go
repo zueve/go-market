@@ -15,9 +15,9 @@ type Service struct {
 	Billing billing.Service
 }
 
-func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (Order, error) {
+func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (OrderVal, error) {
 	s.log(ctx).Info().Msgf("Receive New order: %d", num)
-	order := Order{Num: num, Status: StatusNew, User: user.Login}
+	order := OrderVal{Invoice: num, Status: StatusNew, UserID: user.ID}
 	if err := s.Storage.NewOrder(ctx, order); err != nil {
 		return order, err
 	}
@@ -33,9 +33,9 @@ func (s *Service) GetOrders(ctx context.Context, user services.User) ([]Order, e
 	return orders, nil
 }
 
-func (s *Service) UpdateOrderStatus(ctx context.Context, order Order) (Order, error) {
+func (s *Service) UpdateOrderStatus(ctx context.Context, order OrderVal) (OrderVal, error) {
 	if err := s.Storage.UpdateOrderStatus(ctx, order); err != nil {
-		return Order{}, err
+		return OrderVal{}, err
 	}
 	return order, nil
 }

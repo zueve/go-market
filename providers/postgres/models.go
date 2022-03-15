@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/zueve/go-market/services"
+	"github.com/zueve/go-market/services/accrual"
 )
 
 type Operation struct {
@@ -30,5 +31,26 @@ func (s *Operation) ToOrder() services.ProcessedOrder {
 		},
 		ID:        s.ID,
 		Processed: s.Created,
+	}
+}
+
+type Accrual struct {
+	ID         int       `db:"id"`
+	CustomerID int       `db:"customer_id"`
+	Invoice    int64     `db:"invoice"`
+	Amount     int64     `db:"amount"`
+	Status     string    `db:"status"`
+	Created    time.Time `db:"created"`
+}
+
+func (s *Accrual) ToService() accrual.Order {
+	return accrual.Order{
+		OrderVal: accrual.OrderVal{
+			Invoice: s.Invoice,
+			UserID:  s.CustomerID,
+			Status:  s.Status,
+		},
+		Amount:  s.Amount,
+		Created: s.Created,
 	}
 }

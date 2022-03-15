@@ -1,5 +1,7 @@
 package accrual
 
+import "time"
+
 const (
 	StatusNew        string = "NEW"
 	StatusProcessing string = "PROCESSING"
@@ -7,8 +9,14 @@ const (
 	StatusProcessed  string = "PROCESSED"
 )
 
+type OrderVal struct {
+	Invoice int64  `json:"number"`
+	Status  string `json:"status"`
+	UserID  int    `json:"-"`
+}
+
 type Order struct {
-	Num    int64
-	Status string
-	User   string
+	OrderVal
+	Amount  int64     `json:"accrual"`
+	Created time.Time `json:"uploaded_at"`
 }

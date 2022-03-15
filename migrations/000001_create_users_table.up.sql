@@ -24,3 +24,15 @@ CREATE TABLE IF NOT EXISTS billing_order (
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (billing_id) REFERENCES billing (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS accrual (
+    id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL,
+    invoice BIGINT NOT NULL UNIQUE,
+    amount INT NOT NULL,
+    "status" VARCHAR(16) NOT NULL
+    created TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (customer_id) REFERENCES customer (id)
+);
