@@ -10,8 +10,8 @@ func (s *Storage) GetOrders(ctx context.Context, userID int) ([]accrual.Order, e
 	var operations []Accrual
 	query := `
 		SELECT *
-		JOIN accrual
-		WHERE b.customer_id=$1
+		FROM accrual
+		WHERE customer_id=$1
 		ORDER BY id desc
 	`
 	if err := s.DB.Select(&operations, query, userID); err != nil {
@@ -28,10 +28,10 @@ func (s *Storage) NewOrder(ctx context.Context, order accrual.OrderVal) error {
 	// Add order
 	query := `
 		INSERT INTO accrual(customer_id, invoice, status, amount)
-		VALUES(:UserID, :Invoice, :Status, :Amount)
+		VALUES(:userid, :invoice, :status, :amount)
 		ON CONFLICT DO NOTHING
 	`
-	if _, err := s.DB.NamedExecContext(ctx, query, order); err != nil {
+	if _, err := s.DB.NamedExecContext(ctx, query, &order); err != nil {
 		return err
 	}
 	return nil

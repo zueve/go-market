@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS accrual (
     customer_id INT NOT NULL,
     invoice BIGINT NOT NULL UNIQUE,
     amount INT NOT NULL,
-    "status" VARCHAR(16) NOT NULL
+    "status" VARCHAR(16) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (customer_id) REFERENCES customer (id)

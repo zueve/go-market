@@ -30,7 +30,7 @@ func New(
 		BillingService: billingSrv,
 		AccrualService: accrualSrv,
 	}
-	router.Use(middleware.AllowContentType("application/json"))
+	router.Use(middleware.AllowContentType("application/json", "text/plain"))
 	router.Use(middleware.Heartbeat("/ping"))
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Recoverer)

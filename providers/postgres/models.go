@@ -41,6 +41,7 @@ type Accrual struct {
 	Amount     int64     `db:"amount"`
 	Status     string    `db:"status"`
 	Created    time.Time `db:"created"`
+	Updated    time.Time `db:"updated"`
 }
 
 func (s *Accrual) ToService() accrual.Order {
