@@ -27,8 +27,8 @@ install: ## Install / Rebuild the binary
 
 dependencies-up: ## Pull and start the Docker containers with dependencies in the background
 	@echo "\n${GREEN}Pull and start the Docker containers with dependencies in the background${NC}"
-	docker-compose up -d database
-	cmd/accrual/accrual_darwin_amd64 -a :8090
+	# docker-compose up -d database
+	cmd/accrual/accrual_darwin_amd64 -a :8091
 
 dependencies-down: ## Down the Docker containers with dependencies
 	@echo "\n${YELLOW}Down the Docker containers with dependencies${NC}"

@@ -5,7 +5,6 @@ import (
 
 	"github.com/zueve/go-market/pkg/logging"
 	"github.com/zueve/go-market/services"
-	"github.com/zueve/go-market/services/billing"
 
 	"github.com/rs/zerolog"
 )
@@ -13,7 +12,7 @@ import (
 type Service struct {
 	Storage        StorageExpected
 	AccrualService ExternalAccrualExpected
-	Billing        *billing.Service
+	Billing        BillingService
 }
 
 func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (OrderVal, error) {
@@ -45,6 +44,13 @@ func (s *Service) GetOrders(ctx context.Context, user services.User) ([]Order, e
 func (s *Service) UpdateOrderStatus(ctx context.Context, order OrderVal) (OrderVal, error) {
 	if err := s.Storage.UpdateOrderStatus(ctx, order); err != nil {
 		return OrderVal{}, err
+	}
+	if order.Status == StatusProcessed {
+		// create deposit
+		if _, err := s.Billing.Process(ctx, order.ToDeposit()); err != nil {
+			return OrderVal{}, err
+		}
+
 	}
 	return order, nil
 }

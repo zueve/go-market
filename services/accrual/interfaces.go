@@ -1,6 +1,10 @@
 package accrual
 
-import "context"
+import (
+	"context"
+
+	"github.com/zueve/go-market/services"
+)
 
 type StorageExpected interface {
 	NewOrder(ctx context.Context, order OrderVal) error
@@ -10,4 +14,8 @@ type StorageExpected interface {
 
 type ExternalAccrualExpected interface {
 	ProcessOrder(ctx context.Context, order OrderVal) error
+}
+
+type BillingService interface {
+	Process(ctx context.Context, order services.OrderValue) (services.ProcessedOrder, error)
 }

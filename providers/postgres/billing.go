@@ -21,6 +21,7 @@ func (s *Storage) Process(ctx context.Context, order services.OrderValue) (servi
 	if err := s.DB.GetContext(ctx, &billingID, query, order.UserID); err != nil {
 		return services.ProcessedOrder{}, err
 	}
+	s.log(ctx).Info().Msgf("Process order %s, user %d, billing_id %d", order.UserID, order.Invoice)
 
 	// Start transaction
 	tx := s.DB.MustBegin()
@@ -49,7 +50,8 @@ func (s *Storage) Process(ctx context.Context, order services.OrderValue) (servi
 		amount = -order.Amount
 	}
 	query = `
-		UPDATE billing SET amount = amount + $1
+		UPDATE billing
+		SET amount = amount + $1
 		WHERE id=$2
 	`
 	if _, err := tx.ExecContext(ctx, query, amount, billingID); err != nil {
