@@ -50,7 +50,6 @@ func (s *Service) UpdateOrderStatus(ctx context.Context, order OrderVal) (OrderV
 		if _, err := s.Billing.Process(ctx, order.ToDeposit()); err != nil {
 			return OrderVal{}, err
 		}
-
 	}
 	return order, nil
 }

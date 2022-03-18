@@ -21,7 +21,7 @@ func (s *Storage) Process(ctx context.Context, order services.OrderValue) (servi
 	if err := s.DB.GetContext(ctx, &billingID, query, order.UserID); err != nil {
 		return services.ProcessedOrder{}, err
 	}
-	s.log(ctx).Info().Msgf("Process order %s, user %d, billing_id %d", order.UserID, order.Invoice)
+	s.log(ctx).Info().Msgf("Process order %s, user %d, billing_id %d", order.Invoice, order.UserID, billingID)
 
 	// Start transaction
 	tx := s.DB.MustBegin()
