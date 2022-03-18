@@ -88,20 +88,20 @@ func (s *Storage) GetWithdrawalOrders(ctx context.Context, userID int) ([]servic
 }
 
 func (s *Storage) GetProcessedOrderByInvoice(invoice string) (services.ProcessedOrder, error) {
-	order := services.ProcessedOrder{}
+	op := Operation{}
 	query := "SELECT * from billing_order where invoice=$1"
-	if err := s.DB.Get(&order, query, invoice); err != nil {
-		return order, err
+	if err := s.DB.Get(&op, query, invoice); err != nil {
+		return services.ProcessedOrder{}, err
 	}
-	return order, nil
+	return op.ToOrder(), nil
 }
 
 func (s *Storage) GetBalance(ctx context.Context, userID int) (billing.Balance, error) {
 	query := `
 		SELECT b.amount balance, coalesce(sum(o.amount), 0) withdrawn
 		FROM billing b
-		LEFT JOIN billing_order o on (b.id = o.billing_id)
-		WHERE customer_id=$1
+		LEFT JOIN billing_order o on (b.id = o.billing_id and direction=$2)
+		WHERE b.customer_id=$1
 		GROUP BY b.amount
 	`
 	type Row struct {
@@ -109,13 +109,13 @@ func (s *Storage) GetBalance(ctx context.Context, userID int) (billing.Balance, 
 		Withdrawn int64 `db:"withdrawn"`
 	}
 	var row Row
-	if err := s.DB.GetContext(ctx, &row, query, userID); err != nil {
+	if err := s.DB.GetContext(ctx, &row, query, userID, services.DirectionWithdrawal); err != nil {
 		if err == sql.ErrNoRows {
 			return billing.Balance{Balance: 0, Withdrawn: 0}, nil
 		}
 		return billing.Balance{}, err
 	}
-
+	s.log(ctx).Info().Msgf("Balance %d, Withdrawn %d", row.Balance, row.Withdrawn)
 	balance := billing.Balance{Balance: row.Balance, Withdrawn: row.Withdrawn}
 	return balance, nil
 }
