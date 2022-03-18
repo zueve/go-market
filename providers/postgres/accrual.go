@@ -40,8 +40,8 @@ func (s *Storage) NewOrder(ctx context.Context, order accrual.OrderVal) error {
 func (s *Storage) UpdateOrderStatus(ctx context.Context, order accrual.OrderVal) error {
 	query := `
 		UPDATE accrual
-		SET status=:Status, amount:Amount, updated=now()
-		WHERE invoice = :Invoice
+		SET status=:status, amount=:amount, updated=now()
+		WHERE invoice = :invoice
 	`
 	if _, err := s.DB.NamedExecContext(ctx, query, order); err != nil {
 		return err

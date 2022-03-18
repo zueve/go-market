@@ -11,8 +11,9 @@ import (
 )
 
 type Service struct {
-	Storage StorageExpected
-	Billing billing.Service
+	Storage        StorageExpected
+	AccrualService ExternalAccrualExpected
+	Billing        *billing.Service
 }
 
 func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (OrderVal, error) {
@@ -24,6 +25,9 @@ func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (
 		Amount:  0,
 	}
 	if err := s.Storage.NewOrder(ctx, order); err != nil {
+		return order, err
+	}
+	if err := s.AccrualService.ProcessOrder(ctx, order); err != nil {
 		return order, err
 	}
 	return order, nil

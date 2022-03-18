@@ -13,14 +13,14 @@ import (
 
 type Handler struct {
 	Handler        chi.Router
-	UserService    user.Service
-	BillingService billing.Service
-	AccrualService accrual.Service
+	UserService    *user.Service
+	BillingService *billing.Service
+	AccrualService *accrual.Service
 	TokenAuth      *jwtauth.JWTAuth
 }
 
 func New(
-	tokenAuth *jwtauth.JWTAuth, userSrv user.Service, billingSrv billing.Service, accrualSrv accrual.Service,
+	tokenAuth *jwtauth.JWTAuth, userSrv *user.Service, billingSrv *billing.Service, accrualSrv *accrual.Service,
 ) (Handler, error) {
 	router := chi.NewRouter()
 	h := Handler{

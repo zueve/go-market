@@ -17,6 +17,7 @@ import (
 	"github.com/zueve/go-market/config"
 	"github.com/zueve/go-market/pkg/logging"
 	"github.com/zueve/go-market/pkg/migrate"
+	"github.com/zueve/go-market/providers/accrualext"
 	"github.com/zueve/go-market/providers/postgres"
 	"github.com/zueve/go-market/services/accrual"
 	"github.com/zueve/go-market/services/billing"
@@ -55,11 +56,23 @@ func run() error {
 	}
 	defer db.Close()
 
-	storage := postgres.Storage{DB: db}
-	userSrv := user.Service{Storage: &storage}
-	billingSrv := billing.Service{Storage: &storage}
-	accrualSrv := accrual.Service{Storage: &storage, Billing: billingSrv}
+	storage := &postgres.Storage{DB: db}
+	billingSrv := &billing.Service{Storage: storage}
+
+	accrualSrv := &accrual.Service{Storage: storage, Billing: billingSrv, AccrualService: nil}
+	processCh := make(chan accrual.OrderVal)
+	accrualExtClient := &accrualext.AccrualExternalClient{URL: conf.AccrualURI}
+	accrualExtProvider, err := accrualext.New(
+		context.Background(), accrualExtClient, accrualSrv, 2, processCh,
+	)
+	if err != nil {
+		return err
+	}
+	accrualSrv.AccrualService = accrualExtProvider
+
+	userSrv := &user.Service{Storage: storage}
 	tokenAuth := jwtauth.New("HS256", []byte(conf.Secret), nil)
+
 	handler, err := rest.New(tokenAuth, userSrv, billingSrv, accrualSrv)
 	if err != nil {
 		return err

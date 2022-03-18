@@ -7,3 +7,7 @@ type StorageExpected interface {
 	GetOrders(ctx context.Context, userID int) ([]Order, error)
 	UpdateOrderStatus(ctx context.Context, order OrderVal) error
 }
+
+type ExternalAccrualExpected interface {
+	ProcessOrder(ctx context.Context, order OrderVal) error
+}
