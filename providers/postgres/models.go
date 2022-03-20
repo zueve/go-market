@@ -53,7 +53,8 @@ func (s *Accrual) ToService() accrual.Order {
 			Status:  s.Status,
 			Amount:  s.Amount,
 		},
-		InvoiceStr: fmt.Sprintf("%d", s.Invoice),
-		Created:    s.Created,
+		InvoiceStr:  fmt.Sprintf("%d", s.Invoice),
+		AmountFloat: float32(s.Amount * 100),
+		Created:     s.Created,
 	}
 }
