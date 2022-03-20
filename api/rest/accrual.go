@@ -1,6 +1,9 @@
 package rest
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func (s *Handler) getAccrualOrders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -34,7 +37,7 @@ func (s *Handler) createAccrualOrder(w http.ResponseWriter, r *http.Request) {
 	if !s.isValidRequest(ctx, w, r, &num) {
 		return
 	}
-	if !s.isValidInvoice(ctx, w, string(num)) {
+	if !s.isValidInvoice(ctx, w, fmt.Sprint(num)) {
 		return
 	}
 

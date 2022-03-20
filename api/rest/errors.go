@@ -56,7 +56,6 @@ func NewInvoiceError(message string) HTTPError {
 	}
 }
 
-
 func NewBadRequest(message string, code string, details []map[string]string) HTTPError {
 	return HTTPError{
 		StatusCode: http.StatusBadRequest,

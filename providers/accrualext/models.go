@@ -8,6 +8,6 @@ var (
 )
 
 type Response struct {
-	Status  string `json:"status"`
-	Accrual int64  `json:"accrual"`
+	Status  string  `json:"status"`
+	Accrual float32 `json:"accrual"`
 }

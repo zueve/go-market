@@ -29,7 +29,6 @@ func (s *AccrualExternalClient) GetOrderStatus(ctx context.Context, order accrua
 		s.log(ctx).Error().Msgf("accrualExt - receive err %d", response.StatusCode)
 		return Response{}, errors.New("invalid Response")
 	}
-	var data Response
 
 	defer response.Body.Close()
 	payload, err := io.ReadAll(response.Body)
@@ -38,6 +37,7 @@ func (s *AccrualExternalClient) GetOrderStatus(ctx context.Context, order accrua
 		return Response{}, err
 	}
 
+	var data Response
 	if err := json.Unmarshal(payload, &data); err != nil {
 		s.log(ctx).Error().Err(err).Msg("can't parse response")
 		return Response{}, err
