@@ -115,7 +115,7 @@ func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
 }
 
 func (s *Handler) isValidInvoice(ctx context.Context, w http.ResponseWriter, invoice string) bool {
-	_, _, err := goluhn.Calculate(invoice)
+	err := goluhn.Validate(invoice)
 	if err != nil {
 		httpError := NewInvoiceError(err.Error())
 		s.writeHTTPError(ctx, w, httpError)
