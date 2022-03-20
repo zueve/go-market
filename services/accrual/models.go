@@ -1,6 +1,7 @@
 package accrual
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -32,7 +33,7 @@ func (s *OrderVal) ToDeposit() services.OrderValue {
 
 type Order struct {
 	OrderVal
-	InvoiceStr  string    `json:"number"`
-	AmountFloat float32   `json:"accrual"`
-	Created     time.Time `json:"uploaded_at"`
+	InvoiceStr  string      `json:"number"`
+	AmountFloat json.Number `json:"accrual"`
+	Created     time.Time   `json:"uploaded_at"`
 }

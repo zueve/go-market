@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zueve/go-market/pkg/convert"
 	"github.com/zueve/go-market/services"
 	"github.com/zueve/go-market/services/accrual"
 )
@@ -54,7 +55,7 @@ func (s *Accrual) ToService() accrual.Order {
 			Amount:  s.Amount,
 		},
 		InvoiceStr:  fmt.Sprintf("%d", s.Invoice),
-		AmountFloat: float32(s.Amount * 100),
+		AmountFloat: convert.MinorToNumber(s.Amount),
 		Created:     s.Created,
 	}
 }
