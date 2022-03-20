@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog"
 
+	"github.com/zueve/go-market/pkg/convert"
 	"github.com/zueve/go-market/pkg/logging"
 	"github.com/zueve/go-market/services/accrual"
 )
@@ -40,7 +41,7 @@ func (s *Worker) Process(ctx context.Context, order accrual.OrderVal, inpCh chan
 		order.Status = accrual.StatusProcessing
 	case StatusProcessed:
 		order.Status = accrual.StatusProcessed
-		order.Amount = MoneyToMinor(result.Accrual)
+		order.Amount = convert.MoneyToMinor(result.Accrual)
 	default:
 		s.log(ctx).Info().Msgf("On Error - send order back %d", order.Invoice)
 		inpCh <- order

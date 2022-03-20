@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"math"
 	"net/http"
 
+	"github.com/zueve/go-market/pkg/convert"
 	"github.com/zueve/go-market/pkg/logging"
 	"github.com/zueve/go-market/services"
 	"github.com/zueve/go-market/services/billing"
@@ -95,18 +95,10 @@ func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
 	}
 }
 
-func MoneyToMinor(v float32) int64 {
-	return int64(math.Round(float64(v * 100.0)))
-}
-
-func MinorToMoney(v int64) float32 {
-	return float32(v) / 100
-}
-
 func ToBalanceResponse(s *billing.Balance) BalanceResponse {
 	return BalanceResponse{
-		Balance:   MinorToMoney(s.Balance),
-		Withdrawn: MinorToMoney(s.Withdrawn),
+		Balance:   convert.MinorToNumber(s.Balance),
+		Withdrawn: convert.MinorToNumber(s.Withdrawn),
 	}
 }
 func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
@@ -116,7 +108,7 @@ func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
 		result[i] = WithdrawalOrder{
 			Processed: orders[i].Processed,
 			Invoice:   orders[i].Invoice,
-			Amount:    MinorToMoney(orders[i].Amount),
+			Amount:    convert.MinorToNumber(orders[i].Amount),
 		}
 	}
 	return result

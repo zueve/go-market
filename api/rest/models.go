@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -17,8 +18,8 @@ type (
 
 type (
 	BalanceResponse struct {
-		Balance   float32 `json:"balance"`
-		Withdrawn float32 `json:"withdrawn"`
+		Balance   json.Number `json:"balance"`
+		Withdrawn json.Number `json:"withdrawn"`
 	}
 	WithdrawalRequest struct {
 		Invoice string  `json:"order"`
@@ -26,8 +27,8 @@ type (
 	}
 
 	WithdrawalOrder struct {
-		Processed time.Time `json:"processed_at"`
-		Invoice   string    `json:"order"`
-		Amount    float32   `json:"sum"`
+		Processed time.Time   `json:"processed_at"`
+		Invoice   string      `json:"order"`
+		Amount    json.Number `json:"sum"`
 	}
 )

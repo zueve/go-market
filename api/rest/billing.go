@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/zueve/go-market/pkg/convert"
 	"github.com/zueve/go-market/services"
 	"github.com/zueve/go-market/services/user"
 )
@@ -63,7 +64,7 @@ func (s *Handler) createWithdrawal(w http.ResponseWriter, r *http.Request) {
 	order := services.OrderValue{
 		Invoice:   request.Invoice,
 		UserID:    user.ID,
-		Amount:    MoneyToMinor(request.Amount),
+		Amount:    convert.MoneyToMinor(request.Amount),
 		IsDeposit: false,
 	}
 
