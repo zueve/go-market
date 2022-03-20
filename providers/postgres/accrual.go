@@ -2,6 +2,10 @@ package postgres
 
 import (
 	"context"
+	"errors"
+
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 
 	"github.com/zueve/go-market/services/accrual"
 )
@@ -25,13 +29,16 @@ func (s *Storage) GetOrders(ctx context.Context, userID int) ([]accrual.Order, e
 }
 
 func (s *Storage) NewOrder(ctx context.Context, order accrual.OrderVal) error {
+	var pgErr *pgconn.PgError
 	// Add order
 	query := `
 		INSERT INTO accrual(customer_id, invoice, status, amount)
 		VALUES(:userid, :invoice, :status, :amount)
-		ON CONFLICT DO NOTHING
 	`
 	if _, err := s.DB.NamedExecContext(ctx, query, &order); err != nil {
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
+			return accrual.ErrOrderExist
+		}
 		return err
 	}
 	return nil

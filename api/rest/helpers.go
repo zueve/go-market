@@ -9,6 +9,7 @@ import (
 	"github.com/zueve/go-market/pkg/convert"
 	"github.com/zueve/go-market/pkg/logging"
 	"github.com/zueve/go-market/services"
+	"github.com/zueve/go-market/services/accrual"
 	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 
@@ -90,6 +91,8 @@ func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
 		return NewLoginExistsErr(err), true
 	case billing.ErrNotEnoughtMoney:
 		return NewOutOfMoney(err), true
+	case accrual.ErrOrderExist:
+		return NewAccrualOrderExist(err), true
 	default:
 		return HTTPError{}, false
 	}

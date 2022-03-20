@@ -100,3 +100,12 @@ func NewOutOfMoney(err error) HTTPError {
 		Details:    nil,
 	}
 }
+
+func NewAccrualOrderExist(err error) HTTPError {
+	return HTTPError{
+		StatusCode: http.StatusOK,
+		Code:       "OrderExist",
+		Message:    err.Error(),
+		Details:    nil,
+	}
+}
