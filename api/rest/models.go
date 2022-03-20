@@ -18,7 +18,7 @@ type (
 
 type (
 	BalanceResponse struct {
-		Balance   json.Number `json:"balance"`
+		Balance   json.Number `json:"current"`
 		Withdrawn json.Number `json:"withdrawn"`
 	}
 	WithdrawalRequest struct {
