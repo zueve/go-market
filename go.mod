@@ -14,6 +14,7 @@ require (
 )
 
 require (
+	github.com/ShiraazMoollatjie/goluhn v0.0.0-20211017190329-0d86158c056a // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
 	github.com/goccy/go-json v0.7.6 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect

@@ -34,6 +34,9 @@ func (s *Handler) createAccrualOrder(w http.ResponseWriter, r *http.Request) {
 	if !s.isValidRequest(ctx, w, r, &num) {
 		return
 	}
+	if !s.isValidInvoice(ctx, w, string(num)) {
+		return
+	}
 
 	orders, err := s.AccrualService.NewOrder(ctx, user, num)
 	if err != nil {

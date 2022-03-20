@@ -57,6 +57,9 @@ func (s *Handler) createWithdrawal(w http.ResponseWriter, r *http.Request) {
 	if !s.isValidRequest(ctx, w, r, &request) {
 		return
 	}
+	if !s.isValidInvoice(ctx, w, request.Invoice){
+		return
+	}
 	order := services.OrderValue{
 		Invoice:   request.Invoice,
 		UserID:    user.ID,

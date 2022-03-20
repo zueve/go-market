@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/zueve/go-market/services"
@@ -29,8 +30,8 @@ func (s *Operation) ToOrder() services.ProcessedOrder {
 			UserID:    s.CustomerID,
 			IsDeposit: s.IsDeposit(),
 		},
-		ID:        s.ID,
-		Processed: s.Created,
+		ID:         s.ID,
+		Processed:  s.Created,
 	}
 }
 
@@ -52,6 +53,7 @@ func (s *Accrual) ToService() accrual.Order {
 			Status:  s.Status,
 			Amount:  s.Amount,
 		},
+		InvoiceStr: fmt.Sprintf("%d", s.Invoice),
 		Created: s.Created,
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 
+	"github.com/ShiraazMoollatjie/goluhn"
 	"github.com/rs/zerolog"
 )
 
@@ -119,4 +120,14 @@ func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
 		}
 	}
 	return result
+}
+
+func (s *Handler) isValidInvoice(ctx context.Context, w http.ResponseWriter, invoice string) bool {
+	_, _, err := goluhn.Calculate(invoice)
+	if err != nil {
+		httpError := NewInvoiceError(err.Error())
+		s.writeHTTPError(ctx, w, httpError)
+		return false
+	}
+	return true
 }

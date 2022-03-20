@@ -15,7 +15,7 @@ const (
 )
 
 type OrderVal struct {
-	Invoice int64  `json:"number"`
+	Invoice int64  `json:"-"`
 	Status  string `json:"status"`
 	UserID  int    `json:"-"`
 	Amount  int64  `json:"accrual"`
@@ -32,5 +32,6 @@ func (s *OrderVal) ToDeposit() services.OrderValue {
 
 type Order struct {
 	OrderVal
-	Created time.Time `json:"uploaded_at"`
+	InvoiceStr string    `json:"number"`
+	Created    time.Time `json:"uploaded_at"`
 }

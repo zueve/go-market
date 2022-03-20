@@ -47,6 +47,16 @@ func NewValidationError(message string, details []map[string]string) HTTPError {
 	}
 }
 
+func NewInvoiceError(message string) HTTPError {
+	return HTTPError{
+		StatusCode: http.StatusUnprocessableEntity,
+		Code:       "ValidationError",
+		Message:    message,
+		Details:    nil,
+	}
+}
+
+
 func NewBadRequest(message string, code string, details []map[string]string) HTTPError {
 	return HTTPError{
 		StatusCode: http.StatusBadRequest,
