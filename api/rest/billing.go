@@ -27,7 +27,7 @@ func (s *Handler) getWithdrawals(w http.ResponseWriter, r *http.Request) {
 		s.writeResult(ctx, w, http.StatusNoContent, orders)
 		return
 	}
-	s.writeResult(ctx, w, http.StatusOK, orders)
+	s.writeResult(ctx, w, http.StatusOK, ToWithdrawalResponse(orders))
 }
 
 func (s *Handler) getBalance(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +43,7 @@ func (s *Handler) getBalance(w http.ResponseWriter, r *http.Request) {
 		s.writeErr(ctx, w, err)
 		return
 	}
-	s.writeResult(ctx, w, http.StatusOK, balance)
+	s.writeResult(ctx, w, http.StatusOK, ToBalanceResponse(&balance))
 }
 
 func (s *Handler) createWithdrawal(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func (s *Handler) createWithdrawal(w http.ResponseWriter, r *http.Request) {
 	order := services.OrderValue{
 		Invoice:   request.Invoice,
 		UserID:    user.ID,
-		Amount:    request.Amount,
+		Amount:    MoneyToMinor(request.Amount),
 		IsDeposit: false,
 	}
 

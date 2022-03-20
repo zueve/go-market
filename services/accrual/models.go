@@ -25,7 +25,7 @@ func (s *OrderVal) ToDeposit() services.OrderValue {
 	return services.OrderValue{
 		Invoice:   fmt.Sprintf("%d", s.Invoice),
 		UserID:    s.UserID,
-		Amount:    s.Amount,
+		Amount:    s.Amount * 100,
 		IsDeposit: true,
 	}
 }

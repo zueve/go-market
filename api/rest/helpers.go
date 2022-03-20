@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"math"
 	"net/http"
 
 	"github.com/zueve/go-market/pkg/logging"
+	"github.com/zueve/go-market/services"
 	"github.com/zueve/go-market/services/billing"
 	"github.com/zueve/go-market/services/user"
 
@@ -90,4 +92,31 @@ func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
 	default:
 		return HTTPError{}, false
 	}
+}
+
+func MoneyToMinor(v float32) int64 {
+	return int64(math.Round(float64(v * 100.0)))
+}
+
+func MinorToMoney(v int64) float32 {
+	return float32(v) / 100
+}
+
+func ToBalanceResponse(s *billing.Balance) BalanceResponse {
+	return BalanceResponse{
+		Balance:   MinorToMoney(s.Balance),
+		Withdrawn: MinorToMoney(s.Withdrawn),
+	}
+}
+func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
+	result := make([]WithdrawalOrder, len(orders))
+
+	for i := range orders {
+		result[i] = WithdrawalOrder{
+			Processed: orders[i].Processed,
+			Invoice:   orders[i].Invoice,
+			Amount:    MinorToMoney(orders[i].Amount),
+		}
+	}
+	return result
 }

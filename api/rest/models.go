@@ -1,5 +1,9 @@
 package rest
 
+import (
+	"time"
+)
+
 type (
 	AuthRequest struct {
 		Login    string `json:"login"`
@@ -12,8 +16,18 @@ type (
 )
 
 type (
+	BalanceResponse struct {
+		Balance   float32 `json:"balance"`
+		Withdrawn float32 `json:"withdrawn"`
+	}
 	WithdrawalRequest struct {
-		Invoice string `json:"order"`
-		Amount  int64  `json:"sum"`
+		Invoice string  `json:"order"`
+		Amount  float32 `json:"sum"`
+	}
+
+	WithdrawalOrder struct {
+		Processed time.Time `json:"processed_at"`
+		Invoice   string    `json:"order"`
+		Amount    float32   `json:"sum"`
 	}
 )
