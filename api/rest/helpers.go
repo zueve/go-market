@@ -93,6 +93,8 @@ func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
 		return NewOutOfMoney(err), true
 	case accrual.ErrOrderExist:
 		return NewAccrualOrderExist(err), true
+	case accrual.ErrInvoiceExist:
+		return NewAccrualInvoiceExist(err), true
 	default:
 		return HTTPError{}, false
 	}

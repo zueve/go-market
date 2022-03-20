@@ -109,3 +109,12 @@ func NewAccrualOrderExist(err error) HTTPError {
 		Details:    nil,
 	}
 }
+
+func NewAccrualInvoiceExist(err error) HTTPError {
+	return HTTPError{
+		StatusCode: http.StatusConflict,
+		Code:       "InvoiceExist",
+		Message:    err.Error(),
+		Details:    nil,
+	}
+}

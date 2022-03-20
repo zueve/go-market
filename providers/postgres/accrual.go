@@ -36,10 +36,18 @@ func (s *Storage) NewOrder(ctx context.Context, order accrual.OrderVal) error {
 		VALUES(:userid, :invoice, :status, :amount)
 	`
 	if _, err := s.DB.NamedExecContext(ctx, query, &order); err != nil {
-		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
+		if !(errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation) {
+			return err
+		}
+
+		op, err := s.GetAccrualByInvoice(order.Invoice)
+		if err != nil {
+			return err
+		}
+		if op.CustomerID == order.UserID {
 			return accrual.ErrOrderExist
 		}
-		return err
+		return accrual.ErrInvoiceExist
 	}
 	return nil
 }
@@ -54,4 +62,13 @@ func (s *Storage) UpdateOrderStatus(ctx context.Context, order accrual.OrderVal)
 		return err
 	}
 	return nil
+}
+
+func (s *Storage) GetAccrualByInvoice(invoice int64) (Accrual, error) {
+	op := Accrual{}
+	query := "SELECT * from accrual where invoice=$1"
+	if err := s.DB.Get(&op, query, invoice); err != nil {
+		return Accrual{}, err
+	}
+	return op, nil
 }
