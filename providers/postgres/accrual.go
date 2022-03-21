@@ -78,7 +78,7 @@ func (s *Storage) GetOrders(ctx context.Context, status []string) ([]accrual.Ord
 	query := `
 		SELECT *
 		FROM accrual
-		WHERE statuses=ANY($1)
+		WHERE status=ANY($1)
 		ORDER BY id desc
 	`
 	if err := s.DB.Select(&operations, query, status); err != nil {
