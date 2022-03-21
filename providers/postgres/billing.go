@@ -1,0 +1,121 @@
+package postgres
+
+import (
+	"context"
+	"database/sql"
+	"errors"
+
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
+
+	"github.com/zueve/go-market/services"
+	"github.com/zueve/go-market/services/billing"
+)
+
+func (s *Storage) Process(ctx context.Context, order services.OrderValue) (services.ProcessedOrder, error) {
+	var pgErr *pgconn.PgError
+	var billingID int
+
+	// Get billing id
+	query := "SELECT id from billing where customer_id=$1"
+	if err := s.DB.GetContext(ctx, &billingID, query, order.UserID); err != nil {
+		return services.ProcessedOrder{}, err
+	}
+	s.log(ctx).Info().Msgf("Process order %s, user %d, billing_id %d", order.Invoice, order.UserID, billingID)
+
+	// Start transaction
+	tx := s.DB.MustBegin()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			s.log(ctx).Error().Err(err).Msg("")
+		}
+	}()
+
+	// Add order
+	query = `
+		INSERT INTO billing_order(billing_id, invoice, direction, amount)
+		VALUES($1, $2, $3, $4)
+	`
+	if _, err := tx.ExecContext(ctx, query, billingID, order.Invoice, order.Direction(), order.Amount); err != nil {
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
+			return services.ProcessedOrder{}, billing.ErrInvoiceExists
+		}
+		return services.ProcessedOrder{}, err
+	}
+	// Change balance
+	var amount int64
+	if order.IsDeposit {
+		amount = order.Amount
+	} else {
+		amount = -order.Amount
+	}
+	query = `
+		UPDATE billing
+		SET amount = amount + $1
+		WHERE id=$2
+	`
+	if _, err := tx.ExecContext(ctx, query, amount, billingID); err != nil {
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.CheckViolation {
+			return services.ProcessedOrder{}, billing.ErrNotEnoughtMoney
+		}
+	}
+
+	// Commit result
+	if err := tx.Commit(); err != nil {
+		return services.ProcessedOrder{}, err
+	}
+
+	return s.GetProcessedOrderByInvoice(order.Invoice)
+}
+
+func (s *Storage) GetWithdrawalOrders(ctx context.Context, userID int) ([]services.ProcessedOrder, error) {
+	var operations []Operation
+	query := `
+		SELECT b.customer_id, o.*
+		FROM billing b
+		JOIN billing_order o on(b.id=o.billing_id)
+		WHERE b.customer_id=$1 AND o.direction=$2
+		ORDER BY id desc`
+
+	if err := s.DB.Select(&operations, query, userID, services.DirectionWithdrawal); err != nil {
+		return nil, err
+	}
+	orders := make([]services.ProcessedOrder, len(operations))
+	for i := range operations {
+		orders[i] = operations[i].ToOrder()
+	}
+	return orders, nil
+}
+
+func (s *Storage) GetProcessedOrderByInvoice(invoice string) (services.ProcessedOrder, error) {
+	op := Operation{}
+	query := "SELECT * from billing_order where invoice=$1"
+	if err := s.DB.Get(&op, query, invoice); err != nil {
+		return services.ProcessedOrder{}, err
+	}
+	return op.ToOrder(), nil
+}
+
+func (s *Storage) GetBalance(ctx context.Context, userID int) (billing.Balance, error) {
+	query := `
+		SELECT b.amount balance, coalesce(sum(o.amount), 0) withdrawn
+		FROM billing b
+		LEFT JOIN billing_order o on (b.id = o.billing_id and direction=$2)
+		WHERE b.customer_id=$1
+		GROUP BY b.amount
+	`
+	type Row struct {
+		Balance   int64 `db:"balance"`
+		Withdrawn int64 `db:"withdrawn"`
+	}
+	var row Row
+	if err := s.DB.GetContext(ctx, &row, query, userID, services.DirectionWithdrawal); err != nil {
+		if err == sql.ErrNoRows {
+			return billing.Balance{Balance: 0, Withdrawn: 0}, nil
+		}
+		return billing.Balance{}, err
+	}
+	s.log(ctx).Info().Msgf("Balance %d, Withdrawn %d", row.Balance, row.Withdrawn)
+	balance := billing.Balance{Balance: row.Balance, Withdrawn: row.Withdrawn}
+	return balance, nil
+}
