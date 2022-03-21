@@ -10,7 +10,7 @@ import (
 	"github.com/zueve/go-market/services/accrual"
 )
 
-func (s *Storage) GetOrders(ctx context.Context, userID int) ([]accrual.Order, error) {
+func (s *Storage) GetUserOrders(ctx context.Context, userID int) ([]accrual.Order, error) {
 	var operations []Accrual
 	query := `
 		SELECT *
@@ -71,4 +71,22 @@ func (s *Storage) GetAccrualByInvoice(invoice int64) (Accrual, error) {
 		return Accrual{}, err
 	}
 	return op, nil
+}
+
+func (s *Storage) GetOrders(ctx context.Context, status []string) ([]accrual.Order, error) {
+	var operations []Accrual
+	query := `
+		SELECT *
+		FROM accrual
+		WHERE statuses=ANY($1)
+		ORDER BY id desc
+	`
+	if err := s.DB.Select(&operations, query, status); err != nil {
+		return nil, err
+	}
+	orders := make([]accrual.Order, len(operations))
+	for i := range operations {
+		orders[i] = operations[i].ToService()
+	}
+	return orders, nil
 }

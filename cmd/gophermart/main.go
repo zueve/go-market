@@ -36,6 +36,7 @@ func main() {
 }
 
 func run() error {
+	ctx := context.Background()
 	conf, err := config.NewFromEnv()
 	if err != nil {
 		return err
@@ -63,7 +64,7 @@ func run() error {
 	processCh := make(chan accrual.OrderVal)
 	accrualExtClient := &accrualext.AccrualExternalClient{URL: conf.AccrualURI}
 	accrualExtProvider, err := accrualext.New(
-		context.Background(), accrualExtClient, accrualSrv, 2, processCh,
+		ctx, accrualExtClient, accrualSrv, 2, processCh,
 	)
 	if err != nil {
 		return err
@@ -72,6 +73,10 @@ func run() error {
 
 	userSrv := &user.Service{Storage: storage}
 	tokenAuth := jwtauth.New("HS256", []byte(conf.Secret), nil)
+
+	if err = accrualSrv.RefreshUnprocessedOrders(ctx); err != nil {
+		return err
+	}
 
 	handler, err := rest.New(tokenAuth, userSrv, billingSrv, accrualSrv)
 	if err != nil {

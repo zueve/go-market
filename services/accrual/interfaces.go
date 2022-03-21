@@ -8,7 +8,8 @@ import (
 
 type StorageExpected interface {
 	NewOrder(ctx context.Context, order OrderVal) error
-	GetOrders(ctx context.Context, userID int) ([]Order, error)
+	GetUserOrders(ctx context.Context, userID int) ([]Order, error)
+	GetOrders(ctx context.Context, status []string) ([]Order, error)
 	UpdateOrderStatus(ctx context.Context, order OrderVal) error
 }
 

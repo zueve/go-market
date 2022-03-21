@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -83,6 +84,16 @@ func (s *Handler) writeResponse(ctx context.Context, w http.ResponseWriter, stat
 	}
 }
 
+func (s *Handler) isValidInvoice(ctx context.Context, w http.ResponseWriter, invoice string) bool {
+	err := goluhn.Validate(invoice)
+	if err != nil {
+		httpError := NewInvoiceError(err.Error())
+		s.writeHTTPError(ctx, w, httpError)
+		return false
+	}
+	return true
+}
+
 func (s *Handler) toHTTPError(err error) (HTTPError, bool) {
 	switch err {
 	case user.ErrAuth:
@@ -106,6 +117,7 @@ func ToBalanceResponse(s *billing.Balance) BalanceResponse {
 		Withdrawn: convert.MinorToNumber(s.Withdrawn),
 	}
 }
+
 func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
 	result := make([]WithdrawalOrder, len(orders))
 
@@ -119,12 +131,16 @@ func ToWithdrawalResponse(orders []services.ProcessedOrder) []WithdrawalOrder {
 	return result
 }
 
-func (s *Handler) isValidInvoice(ctx context.Context, w http.ResponseWriter, invoice string) bool {
-	err := goluhn.Validate(invoice)
-	if err != nil {
-		httpError := NewInvoiceError(err.Error())
-		s.writeHTTPError(ctx, w, httpError)
-		return false
+func ToAccrualOrdersResponse(orders []accrual.Order) []AccrualOrder {
+	result := make([]AccrualOrder, len(orders))
+
+	for i := range orders {
+		result[i] = AccrualOrder{
+			Invoice: fmt.Sprint(orders[i].Invoice),
+			Amount:  convert.MinorToNumber(orders[i].Amount),
+			Created: orders[i].Created,
+			Status:  orders[i].Status,
+		}
 	}
-	return true
+	return result
 }

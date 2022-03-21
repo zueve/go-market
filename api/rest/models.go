@@ -32,3 +32,12 @@ type (
 		Amount    json.Number `json:"sum"`
 	}
 )
+
+type (
+	AccrualOrder struct {
+		Invoice string      `json:"number"`
+		Amount  json.Number `json:"accrual"`
+		Created time.Time   `json:"uploaded_at"`
+		Status  string      `json:"status"`
+	}
+)

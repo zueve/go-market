@@ -1,10 +1,8 @@
 package postgres
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/zueve/go-market/pkg/convert"
 	"github.com/zueve/go-market/services"
 	"github.com/zueve/go-market/services/accrual"
 )
@@ -54,8 +52,6 @@ func (s *Accrual) ToService() accrual.Order {
 			Status:  s.Status,
 			Amount:  s.Amount,
 		},
-		InvoiceStr:  fmt.Sprintf("%d", s.Invoice),
-		AmountFloat: convert.MinorToNumber(s.Amount),
-		Created:     s.Created,
+		Created: s.Created,
 	}
 }

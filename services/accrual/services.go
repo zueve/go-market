@@ -15,6 +15,20 @@ type Service struct {
 	Billing        BillingService
 }
 
+func (s *Service) RefreshUnprocessedOrders(ctx context.Context) error {
+	unprocessedStatuses := []string{StatusNew, StatusProcessing}
+	orders, err := s.Storage.GetOrders(ctx, unprocessedStatuses)
+	if err != nil {
+		return err
+	}
+	for i := range orders {
+		if err := s.AccrualService.ProcessOrder(ctx, orders[i].OrderVal); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (OrderVal, error) {
 	s.log(ctx).Info().Msgf("Receive New order: %d", num)
 	order := OrderVal{
@@ -33,7 +47,7 @@ func (s *Service) NewOrder(ctx context.Context, user services.User, num int64) (
 }
 
 func (s *Service) GetOrders(ctx context.Context, user services.User) ([]Order, error) {
-	orders, err := s.Storage.GetOrders(ctx, user.ID)
+	orders, err := s.Storage.GetUserOrders(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}

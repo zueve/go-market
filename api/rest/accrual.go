@@ -22,7 +22,7 @@ func (s *Handler) getAccrualOrders(w http.ResponseWriter, r *http.Request) {
 		s.writeResult(ctx, w, http.StatusNoContent, orders)
 		return
 	}
-	s.writeResult(ctx, w, http.StatusOK, orders)
+	s.writeResult(ctx, w, http.StatusOK, ToAccrualOrdersResponse(orders))
 }
 
 func (s *Handler) createAccrualOrder(w http.ResponseWriter, r *http.Request) {
@@ -41,11 +41,11 @@ func (s *Handler) createAccrualOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orders, err := s.AccrualService.NewOrder(ctx, user, num)
+	order, err := s.AccrualService.NewOrder(ctx, user, num)
 	if err != nil {
 		s.writeErr(ctx, w, err)
 		return
 	}
 
-	s.writeResult(ctx, w, http.StatusAccepted, orders)
+	s.writeResult(ctx, w, http.StatusAccepted, order)
 }
